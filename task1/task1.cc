@@ -10,21 +10,21 @@
 
 using namespace std;
 using dvec = vector<double>;
-
 struct Interval
 {
 	double first;
 	double last;
-	// double cur{first};
-	// double operator++() 
-	// {
-	// 	return cur += m_step();
-	// };
-	// double operator*(){return cur;};
-	// double (*m_step)() = {[]()->double {return 0.01;}};
-	// //Interval() = default;
-	// Interval(double (*step)()):m_step{step} {};
 };
+
+const double nodes = 10;
+const double h = 0.01;
+const double pi = 3.14159265;
+
+// auto func = [](double a)->double{return a*sin(a);};
+auto func = [](double a)->double{return a*abs(a);};
+Interval interval = {-2,2};
+auto step = [](int i)->double{return h;};
+
 
 ostream& operator<< (ostream &os, dvec& x)
 {
@@ -41,11 +41,11 @@ ostream& operator<< (ostream &os, dvec& x)
 }
 
 template<typename F>
-void makeNodeOfInterval(dvec& x, Interval& interval, const F& step)
+void makeNodeOfInterval(dvec& x, const F& next)
 {
-	for (double i = interval.first; i <= interval.last; i += step()) 
+	for (int i = 0; i < nodes; i++) 
 	{
-		x.push_back(i);
+		x.push_back(next(i));
 	} 
 }
 
@@ -73,9 +73,10 @@ double polynome(double a, dvec& x, dvec& y)
 	}
 	return r;
 }
-void out(map<string, dvec>& opts)
+void out(map<string, dvec>& opts, string title)
 {
-	ofstream os("task1.sce");
+	string name = title + ".sce";
+	ofstream os(name);
 
 	if (opts.size()) 
 	{
@@ -96,28 +97,24 @@ void out(map<string, dvec>& opts)
 	    os<<"plot(xh,yp,'r');"<<endl;
 	    os<<"plot(x,y,'*');"<<endl;
 	    os<<"xgrid();"<<endl;
-	    os<<"xtitle('delta="<<*delta<<"','X', 'Y');"<<endl;
+	    os<<"xtitle('"<<title<<" delta="<<*delta<<"','X', 'Y');"<<endl;
 	}
 };
 
-int main(int argc, char const *argv[])
+void makeGraphic(string name, dvec& x)
 {
 	
-	const double nodes = 5;
-	const double h = 0.01;
-	dvec x;
-	Interval interval = {-2,2};
-	auto func = [](double a)->double{return a*sin(a);};
-
-	makeNodeOfInterval(x, interval, [&]()->double{return (interval.last-interval.first)/(nodes-1);});
 	dvec&& y = makeResultOnNode(x, func);
 
 	using namespace std::placeholders;
 	auto lagrange = bind(polynome, _1, x, y);
-	auto step = [&h]()->double{return h;};
+	
 
 	dvec xh;
-	makeNodeOfInterval(xh, interval,step);
+	for(double a = interval.first; a <= interval.last; a += h)
+	{
+		xh.push_back(a);
+	}
 	dvec&& yp = makeResultOnNode(xh, lagrange);
 	dvec&& yy = makeResultOnNode(xh, func);
 
@@ -139,8 +136,26 @@ int main(int argc, char const *argv[])
     // cout<<endl;
     vvecs["delts"] = delts;
 
+	out(vvecs, name);
+};
 
-	out(vvecs);
+int main(int argc, char const *argv[])
+{
+	dvec x;
+	auto norm = [](int i)->double{return interval.first + i*((interval.last-interval.first)/(nodes-1));};
+	makeNodeOfInterval(x, norm);
+	makeGraphic("norm", x);
+
+	auto cheb = [](int i)->double
+	{
+		double a = interval.first;
+		double b = interval.last;
+		double yi = (a + b)/2 - (b - a) * cos((2*i+1)*pi/(2*nodes))/2;
+		return yi; 
+	};
+	dvec x2;
+	makeNodeOfInterval(x2, cheb);
+	makeGraphic("cheb", x2);
 
 	return 0;
 }
