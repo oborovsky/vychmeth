@@ -7,6 +7,8 @@
 #include <sstream>
 #include <string>
 #include <functional>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 using dvec = vector<double>;
@@ -24,6 +26,7 @@ const double pi = 3.14159265;
 auto func = [](double a)->double{return a*abs(a);};
 Interval interval = {-2,2};
 auto step = [](int i)->double{return h;};
+auto rnd = []()->double{return (double)rand()/RAND_MAX;};
 
 
 ostream& operator<< (ostream &os, dvec& x)
@@ -142,6 +145,7 @@ void makeGraphic(string name, dvec& x)
 int main(int argc, char const *argv[])
 {
 	dvec x;
+	srand(time(NULL));
 	auto norm = [](int i)->double{return interval.first + i*((interval.last-interval.first)/(nodes-1));};
 	makeNodeOfInterval(x, norm);
 	makeGraphic("norm", x);
@@ -156,6 +160,17 @@ int main(int argc, char const *argv[])
 	dvec x2;
 	makeNodeOfInterval(x2, cheb);
 	makeGraphic("cheb", x2);
-
+	auto other = [](int i)->double
+	{
+		double a = interval.first;
+		double b = interval.last;
+		if( i == 0) return a;
+		if (i == 1) return b;
+		double yi = (b - a) * (rnd() - 0.5);
+		return yi;
+	};
+	dvec x3;
+	makeNodeOfInterval(x3, other);
+	makeGraphic("random", x3);
 	return 0;
 }

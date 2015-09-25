@@ -10,7 +10,7 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 all: task1
 
 clean:
-	rm -f task1 *.o *.sce
+	rm -f task1 *.o #*.sce
 
 task1: task1.o
 	g++ $(CPPFLAGS) $^ -o $@
