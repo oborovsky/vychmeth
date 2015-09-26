@@ -23,7 +23,8 @@ const double h = 0.01;
 const double pi = 3.14159265;
 
 // auto func = [](double a)->double{return a*sin(a);};
-auto func = [](double a)->double{return a*abs(a);};
+//auto func = [](double a)->double{return a*abs(a);};
+auto func = [](double a)->double{return a*a+a+1;};
 Interval interval = {-2,2};
 auto step = [](int i)->double{return h;};
 auto rnd = []()->double{return (double)rand()/RAND_MAX;};
@@ -42,7 +43,7 @@ ostream& operator<< (ostream &os, dvec& x)
 	os<<str;
 	return os;
 }
-
+//создаем узлы интерполяции
 template<typename F>
 void makeNodeOfInterval(dvec& x, const F& next)
 {
@@ -51,7 +52,7 @@ void makeNodeOfInterval(dvec& x, const F& next)
 		x.push_back(next(i));
 	} 
 }
-
+// находим значение фукции f по точкам
 template<typename F>
 dvec makeResultOnNode(dvec& x, const F& f)
 {
@@ -59,6 +60,7 @@ dvec makeResultOnNode(dvec& x, const F& f)
 	transform (x.begin(), x.end(), y.begin(), f);
 	return move(y);
 }
+//интерполяционный полином Лагранжа
 double polynome(double a, dvec& x, dvec& y)
 {
 	double r = 0;
@@ -146,10 +148,11 @@ int main(int argc, char const *argv[])
 {
 	dvec x;
 	srand(time(NULL));
+	// равномерное распределение узлов
 	auto norm = [](int i)->double{return interval.first + i*((interval.last-interval.first)/(nodes-1));};
 	makeNodeOfInterval(x, norm);
 	makeGraphic("norm", x);
-
+	// использование Чебышёвских узлов
 	auto cheb = [](int i)->double
 	{
 		double a = interval.first;
@@ -160,6 +163,7 @@ int main(int argc, char const *argv[])
 	dvec x2;
 	makeNodeOfInterval(x2, cheb);
 	makeGraphic("cheb", x2);
+	// произвольное распределение узлов
 	auto other = [](int i)->double
 	{
 		double a = interval.first;
