@@ -14,10 +14,16 @@ struct Interval
 	double length() { return b - a;};
 };
 
-const unsigned long n = 100;
+const unsigned long n = 4;
 
 auto func = [](double a)->double {return sqrt(a);};
 Interval interval = {0,3};
+// auto func = [](double a)->double{return a*sin(a);};
+// Interval interval = {0,4};
+// auto func = [](double a)->double {return 1/(1+a);};
+// Interval interval = {0,1};
+// auto func = [](double a)->double {return a/(1+a*a);};
+// Interval interval = {-1,1};
 
 ostream& operator<< (ostream &os, dvec& x)
 {
@@ -51,10 +57,35 @@ double integralSimpson(dvec& x)
 		result += 4 * func(x[i]) + 2 * func(x[i+1]);
 	}
 	result += func(x[length-1]);
-	result *= interval.length()/(3 * length);
+	result *= interval.length()/(3 * (length-1));
 	return result;
 }
-double integralGauss(dvec&x)
+double integralTrapeze(dvec& x)
+{
+	double result = func(x[0]);
+	unsigned long length = x.size();
+
+	for(unsigned long i = 1; i < length - 1 ; i++)
+	{
+		result += 2 * func(x[i]);
+	}
+	result += func(x[length-1]);
+	result *= interval.length()/(2 * (length-1));
+	return result;
+}
+double integralRectangle(dvec& x)
+{
+	double result = 0;
+	unsigned long length = x.size();
+
+	for(unsigned long i = 0; i < length - 1 ; i++)
+	{
+		result += func((x[i] + x[i+1])/2);
+	}
+	result *= interval.length()/(length-1);
+	return result;	
+}
+double integralGauss(dvec& x)
 {
 	double result = 0;
 	unsigned long length = x.size();
@@ -82,17 +113,29 @@ int main(int argc, char const *argv[])
 	makeNodeOfInterval(x2, 2*n, next2);
 	// cout<<x<<endl;
 	// cout<<x2<<endl;
-	double S1 = integralSimpson(x);
-	double S2 = integralSimpson(x2);
-	double pogr = (S2 - S1);
-	double I = 3.464101615;
-	double p = (I - S1)/(I-S2);
-	p = log2(p);
-	cout<<"p="<<p<<endl;
-	cout<<"Simpson's method for h:"<<setiosflags(ios::scientific)<<setprecision(6)<<S1<<endl;
-	cout<<"Simpson's method for h/2:"<<S2<<endl;
-	cout<<"Ih/2 - Ih / 2^4-1= "<<pogr<<endl;
-	cout<<"I*="<<(2*S2 - S1)<<endl;
-	cout<<"Gauss's method(n=2) :"<<integralGauss(x)<<endl;
+	// double S1 = integralSimpson(x);
+	// double S2 = integralSimpson(x2);
+	// double Tr1 = integralTrapeze(x);
+	// double Tr2 = integralTrapeze(x2);
+	double Rect1 = integralRectangle(x);
+	double Rect2 = integralRectangle(x2);
+	double G = integralGauss(x);
+	double I = 3.4641;
+	// double pogrS = (S2 - S1)/15;
+	// double pogrTr = (Tr2 - Tr1)/3;
+	double pogrRect = (Rect2 - Rect1)/3;
+	// cout<<"Simpson's method for n="<<n<<" :"<<setiosflags(ios::scientific)<<setprecision(6)<<S1<<endl;
+	// cout<<"Simpson's method for n="<<2*n<<" :"<<S2<<endl;
+	// cout<<"Ih/2 - Ih / 2^4-1= "<<pogrS<<endl;
+	// cout<<"Trapeze method for n="<<n<<" :"<<setiosflags(ios::scientific)<<setprecision(6)<<Tr1<<endl;
+	// cout<<"Trapeze method for n="<<2*n<<" :"<<Tr2<<endl;
+	// cout<<"Ih/2 - Ih / 2^2-1= "<<pogrTr<<endl;
+	cout<<"Rectangle method for n="<<n<<" :"<<setiosflags(ios::scientific)<<setprecision(6)<<Rect1<<endl;
+	cout<<"Rectangle method for n="<<2*n<<" :"<<Rect2<<endl;
+	cout<<"Ih/2 - Ih / 2^2-1= "<<pogrRect<<endl;
+	cout<<"I* = "<<(4*Rect2-Rect1)/3<<endl;
+	cout<<"p="<<log2((I-Rect1)/(I-Rect2))<<endl;
+	// cout<<"I*="<<(2*S2 - S1)<<endl;
+	cout<<"Gauss's method(n=2) :"<<G<<endl;
 	return 0;
 }
