@@ -47,32 +47,7 @@ void makeNodeOfInterval(dvec& x, unsigned long nodes, const F& next)
 		x.push_back(next(i));
 	} 
 }
-double integralSimpson(dvec& x)
-{
-	double result = func(x[0]);
-	unsigned long length = x.size();
 
-	for(unsigned long i = 1; i < length - 1 ; i += 2)
-	{
-		result += 4 * func(x[i]) + 2 * func(x[i+1]);
-	}
-	result += func(x[length-1]);
-	result *= interval.length()/(3 * (length-1));
-	return result;
-}
-double integralTrapeze(dvec& x)
-{
-	double result = func(x[0]);
-	unsigned long length = x.size();
-
-	for(unsigned long i = 1; i < length - 1 ; i++)
-	{
-		result += 2 * func(x[i]);
-	}
-	result += func(x[length-1]);
-	result *= interval.length()/(2 * (length-1));
-	return result;
-}
 double integralRectangle(dvec& x)
 {
 	double result = 0;
@@ -97,7 +72,6 @@ double integralGauss(dvec& x)
 		double z1 = (a + b)/2 - (b-a)*sqrt(3)/6;
 		double z2 = (a + b)/2 + (b-a)*sqrt(3)/6;
 		result += func(z1)*(b-a)/2 + func(z2)*(b-a)/2;
-		// cout<<"["<<a<<","<<b<<"] "<<"z1="<<z1<<", z2="<<z2<<", result="<<result<<endl;
 	}
 	return result;
 }
@@ -111,31 +85,16 @@ int main(int argc, char const *argv[])
 	dvec x2;
 	auto next2 = bind(f, _1, 2*n);
 	makeNodeOfInterval(x2, 2*n, next2);
-	// cout<<x<<endl;
-	// cout<<x2<<endl;
-	// double S1 = integralSimpson(x);
-	// double S2 = integralSimpson(x2);
-	// double Tr1 = integralTrapeze(x);
-	// double Tr2 = integralTrapeze(x2);
 	double Rect1 = integralRectangle(x);
 	double Rect2 = integralRectangle(x2);
 	double G = integralGauss(x);
 	double I = 3.4641;
-	// double pogrS = (S2 - S1)/15;
-	// double pogrTr = (Tr2 - Tr1)/3;
 	double pogrRect = (Rect2 - Rect1)/3;
-	// cout<<"Simpson's method for n="<<n<<" :"<<setiosflags(ios::scientific)<<setprecision(6)<<S1<<endl;
-	// cout<<"Simpson's method for n="<<2*n<<" :"<<S2<<endl;
-	// cout<<"Ih/2 - Ih / 2^4-1= "<<pogrS<<endl;
-	// cout<<"Trapeze method for n="<<n<<" :"<<setiosflags(ios::scientific)<<setprecision(6)<<Tr1<<endl;
-	// cout<<"Trapeze method for n="<<2*n<<" :"<<Tr2<<endl;
-	// cout<<"Ih/2 - Ih / 2^2-1= "<<pogrTr<<endl;
 	cout<<"Rectangle method for n="<<n<<" :"<<setiosflags(ios::scientific)<<setprecision(6)<<Rect1<<endl;
 	cout<<"Rectangle method for n="<<2*n<<" :"<<Rect2<<endl;
 	cout<<"Ih/2 - Ih / 2^2-1= "<<pogrRect<<endl;
 	cout<<"I* = "<<(4*Rect2-Rect1)/3<<endl;
 	cout<<"p="<<log2((I-Rect1)/(I-Rect2))<<endl;
-	// cout<<"I*="<<(2*S2 - S1)<<endl;
 	cout<<"Gauss's method(n=2) :"<<G<<endl;
 	return 0;
 }
