@@ -22,7 +22,7 @@ Interval interval = {1,2};
 
 inline double sgn(double x) 
 {
-	if (x >= 0) return 1;
+	if (x > 0) return 1;
 	if (x < 0) return -1;
 	return 0;
 }
@@ -31,8 +31,8 @@ void bisection()
 {
 	double a = interval.a;
 	double b = interval.b;
-    double h = (b-a)/2;
-    double x = a + h;
+    double h = (b-a);
+    double x = a + h/2;
 
 	unsigned long n = log2(interval.length()/E) + 1;
 	cout<<"bisection---------------------------------------------"<<endl;
@@ -40,15 +40,7 @@ void bisection()
     // cout<<"x="<<x<<", h="<<h<<endl;
 	for (unsigned long i = 0; i < n; i++)
 	{
-		if ( f(a) * f(x) < 0) 
-		{
-			b = x;
-		}else 
-		{
-			a = x;
-		}
-		h = (b-a)/2;
-		x = a + h;
+		x += sgn(f(a)) * sgn(f(x))*h/pow(2,i+2);
 		//cout<<"x="<<x<<", h="<<h<<endl;
 	}
 
