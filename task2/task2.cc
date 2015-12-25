@@ -14,17 +14,17 @@ struct Interval
 	double length() { return b - a;};
 };
 
-const unsigned long n = 256;
+const unsigned long n = 1000;
 
-// auto func = [](double a)->double {return sqrt(a);};
-// Interval interval = {0,3};
-// double I = (2/3)*(pow(sqrt(interval.b),3) - pow(sqrt(interval.a),3));
+auto func = [](double a)->double {return sqrt(a);};
+Interval interval = {0,3};
+double I = 2*(pow(sqrt(interval.b),3) - pow(sqrt(interval.a),3))/3;
 // auto func = [](double a)->double {return exp(a);};
 // Interval interval = {-1,2};
 // double I = exp(interval.b)-exp(interval.a);
-auto func = [](double a)->double{return a*sin(a);};
-Interval interval = {0,4};
-double I = sin(interval.b)-interval.b*cos(interval.b) - sin(interval.a) + interval.a*cos(interval.a);
+// auto func = [](double a)->double{return a*sin(a);};
+// Interval interval = {0,4};
+// double I = sin(interval.b)-interval.b*cos(interval.b) - sin(interval.a) + interval.a*cos(interval.a);
 // auto func = [](double a)->double {return 1/(1+a);};
 // Interval interval = {0,1};
 // double I = log(1+interval.b) - log(1 + interval.a);
@@ -109,6 +109,7 @@ int main(int argc, char const *argv[])
 	cout<<"Rectangle method for n="<<n<<" :"<<setiosflags(ios::scientific)<<setprecision(6)<<Rect1<<endl;
 	cout<<"Rectangle method for n="<<2*n<<" :"<<Rect2<<endl;
 	cout<<"Ih/2 - Ih / 2^2-1= "<<pogrRect<<endl;
+	cout<<"I = "<<I<<endl;
 	cout<<"I* = "<<(4*Rect2-Rect1)/3<<endl;
 	cout<<"p="<<log2((I-Rect1)/(I-Rect2))<<endl;
 	cout<<"experemental p="<<log2((Rect16 - Rect1)/(Rect16-Rect2))<<endl;
