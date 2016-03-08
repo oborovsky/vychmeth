@@ -9,6 +9,7 @@
 #include <map>
 #include <functional>
 #include <cstdlib>
+#include <exception>
 
 using namespace std;
 using dvec=vector<double>;
@@ -120,7 +121,7 @@ dvec shuttle(matrix &m, dvec& d)
 		e[i+1] = -c[i] / k;
 		n[i+1] = (d[i] - a[i]*n[i]) / k;
 	}
-	cout<<"e="<<e<<endl<<"n="<<n<<endl;
+	// cout<<"e="<<e<<endl<<"n="<<n<<endl;
 	for (counter i = l.size()-1; i > 1; i--)
 	{
 		l[i-1] = e[i]*l[i] + n[i];
@@ -157,29 +158,29 @@ void loadData(dvec& x, dvec& y, double& l0, double ln)
 	}
 	double a, b;
 	is>>a;
-	cout<<"a="<<a<<endl;
+	// cout<<"a="<<a<<endl;
 	is>>b;
-	cout<<"b="<<b<<endl;
+	// cout<<"b="<<b<<endl;
 	counter n;
 	is>>n;
-	cout<<"n="<<n<<endl;
+	// cout<<"n="<<n<<endl;
 	double h = (b - a)/ (n-1);
 	for (counter i = 0; i < n-1; i++)
 	{
 		x.push_back(a + i*h);
 	}
 	x.push_back(b);
-	cout<<"x="<<x<<endl;
+	// cout<<"x="<<x<<endl;
 	for (counter i = 0; i < n; i++)
 	{
 		double r;
 		is>>r;
 		y.push_back(r);
 	}
-	cout<<"y="<<y<<endl;
+	// cout<<"y="<<y<<endl;
 	is>>l0;
 	is>>ln;
-	cout<<"l0="<<l0<<endl<<"ln="<<ln<<endl;
+	// cout<<"l0="<<l0<<endl<<"ln="<<ln<<endl;
 
 }
 // находим значение фукции f по точкам
@@ -204,9 +205,10 @@ void out(map<string, dvec>& opts, string title)
 		}
 		
 		//cout<<"delta="<<*delta<<endl;
+		os<<setiosflags(ios::scientific)<<setprecision(10);
 		os<<"xh="<<opts["xh"]<<";"<<endl;
 	    os<<"yy="<<opts["yy"]<<";"<<endl;
-	    os<<"plot(xh,yy,'m--');"<<endl;
+	    os<<"plot(xh,yy,'r');"<<endl;
 	   // os<<"plot(x,y,'*');"<<endl;
 	    os<<"xgrid();"<<endl;
 	    os<<"xtitle('"<<title<<"','X', 'Y');"<<endl;
@@ -235,33 +237,39 @@ void makeGraphic(string name, dvec& x, dvec& y, dvec& h, dvec& l)
 
 int main(int argc, char const *argv[])
 {
-	dvec x;//{0, 0.5, 1, 1.5};
-	dvec y;//{0, 1, 3, 6};
+	dvec x;
+	dvec y;
 	double l0=0,ln=0;
 
 	loadData(x, y, l0, ln);
 
 	dvec&& h = makeH(x);
 	matrix&& m = makeMatrix(h);
-	cout<<"m="<<endl<<m<<endl;
-	// m[0] = {0,2,0.5};
-	// m[1] = {0.5,2,0};
+	// cout<<"m="<<endl<<m<<endl;
 	dvec&& d = makeB(y, h, 0, 1);// {12, 23/2};
-	cout<<"d="<<d<<endl;
+	// cout<<"d="<<d<<endl;
 
 	dvec&& l = shuttle(m, d);
 	l[l.size()-1] = 1;
 	l.insert(begin(l),0);
-	cout<<"l="<<l<<endl;
+	// cout<<"l="<<l<<endl;
 
 	try {
-		double a = Spline(x, y, h, l, 1);
 		makeGraphic("spline",x,y,h,l);
-		cout<<a<<endl;
+		string a = ""; 
+		do{
+			cout<<"input "<<x[0]<<"<x<"<<x[x.size()-1]<<":";
+			cin>>a;
+			if ( a != "e") cout<<endl<<"S("<<a<<")="<<Spline(x, y, h, l, stod(a))<<endl;
+		} while (a != "e");
 	}
 	catch(const char* err)
 	{
 		cout<<err<<endl;
+	}
+	catch(exception &e)
+	{
+		cout<<"error:"<<e.what()<<endl;
 	}
 	return 0;
 }
