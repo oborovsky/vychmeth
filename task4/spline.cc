@@ -250,8 +250,8 @@ int main(int argc, char const *argv[])
 	// cout<<"d="<<d<<endl;
 
 	dvec&& l = shuttle(m, d);
-	l[l.size()-1] = 1;
-	l.insert(begin(l),0);
+	l[l.size()-1] = ln;
+	l.insert(begin(l),l0);
 	// cout<<"l="<<l<<endl;
 
 	try {
