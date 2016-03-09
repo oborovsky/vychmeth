@@ -15,6 +15,7 @@ using namespace std;
 using dvec=vector<double>;
 using matrix = vector<dvec>;
 using counter = unsigned int;
+string name = "spline.txt";
 
 ostream& operator<< (ostream &os, dvec& x)
 {
@@ -31,9 +32,26 @@ ostream& operator<< (ostream &os, dvec& x)
 }
 ostream& operator<< (ostream &os, matrix& m)
 {
-	for (auto v : m)
+	// for (auto v : m)
+	// {
+	// 	os<<v<<endl;
+	// }
+	for (counter i = 0; i < m.size(); i++)
 	{
+		dvec v = m[i];
+		if( i == 0)
+		{
+		   v.erase(begin(v));
+		   v.push_back(0);
+
+		};
+		if( i == m.size() - 1)
+		{
+			v.pop_back();
+			v.insert(begin(v),0);
+		}
 		os<<v<<endl;
+
 	}
 	return os;
 }
@@ -63,8 +81,19 @@ dvec makeB(dvec& y, dvec& h, double l0, double ln)
 	for (counter i = 1; i < n - 1; i++)
 	{
 		double r  = 6*(y[i+1] - y[i])/h[i+1] - 6*(y[i] - y[i-1])/h[i];
+		if ( i == 1)
+		{
+			// cout<<"y:"<<y[i+1]<<","<<y[i]<<","<<y[i-1]<<endl;		
+		 // 	cout<<"r="<<r<<endl;
+	 	}
 		if (i == 1) r -= l0*h[i];
-		if (i == n-2) r -= ln*h[i+1];
+		if (i == n-2)
+		{
+			cout<<"r="<<r<<"ln="<<ln<<endl;
+			 r -= ln*h[i+1];
+			 cout<<"r="<<r<<endl;
+		}
+		if( i == n-2) cout<<"h="<<h[i+1]<<endl;
 		b.push_back(r);
 	}
 	return b;
@@ -147,9 +176,9 @@ double Spline(dvec& x, dvec&y, dvec& h, dvec& l, double a)
 	y[i-1]*(x[i]-a)/h[i] + y[i]*(a-x[i-1])/h[i];
 	return r;
 }
-void loadData(dvec& x, dvec& y, double& l0, double ln)
+void loadData(dvec& x, dvec& y, double& l0, double& ln)
 {
-	string name = "spline.txt";
+	//string name = "spline1.txt";
 	ifstream is(name);
 	if(!is) 
 	{
@@ -164,23 +193,23 @@ void loadData(dvec& x, dvec& y, double& l0, double ln)
 	counter n;
 	is>>n;
 	// cout<<"n="<<n<<endl;
-	double h = (b - a)/ (n-1);
-	for (counter i = 0; i < n-1; i++)
+	double h = (b - a)/ (n);
+	for (counter i = 0; i < n; i++)
 	{
 		x.push_back(a + i*h);
 	}
 	x.push_back(b);
-	// cout<<"x="<<x<<endl;
-	for (counter i = 0; i < n; i++)
+	 cout<<"x="<<x<<endl;
+	for (counter i = 0; i < n + 1; i++)
 	{
 		double r;
 		is>>r;
 		y.push_back(r);
 	}
-	// cout<<"y="<<y<<endl;
+	 cout<<"y="<<y<<endl;
 	is>>l0;
 	is>>ln;
-	// cout<<"l0="<<l0<<endl<<"ln="<<ln<<endl;
+    // cout<<"l0="<<l0<<endl<<"ln="<<ln<<endl;
 
 }
 // находим значение фукции f по точкам
@@ -206,8 +235,8 @@ void out(map<string, dvec>& opts, string title)
 		
 		//cout<<"delta="<<*delta<<endl;
 		os<<setiosflags(ios::scientific)<<setprecision(10);
-		os<<"xh="<<opts["xh"]<<";"<<endl;
-	    os<<"yy="<<opts["yy"]<<";"<<endl;
+		os<<setiosflags(ios::scientific)<<setprecision(10)<<"xh="<<opts["xh"]<<";"<<endl;
+	    os<<setiosflags(ios::scientific)<<setprecision(10)<<"yy="<<opts["yy"]<<";"<<endl;
 	    os<<"plot(xh,yy,'r');"<<endl;
 	   // os<<"plot(x,y,'*');"<<endl;
 	    os<<"xgrid();"<<endl;
@@ -237,17 +266,23 @@ void makeGraphic(string name, dvec& x, dvec& y, dvec& h, dvec& l)
 
 int main(int argc, char const *argv[])
 {
+	if (argc > 1) 
+	{
+		name = string(argv[1]);
+		cout<<name<<endl;
+	}
 	dvec x;
 	dvec y;
 	double l0=0,ln=0;
 
 	loadData(x, y, l0, ln);
-
+    cout<<"l0="<<l0<<",ln="<<ln<<endl;
 	dvec&& h = makeH(x);
+	cout<<"h="<<h<<endl;
 	matrix&& m = makeMatrix(h);
-	// cout<<"m="<<endl<<m<<endl;
-	dvec&& d = makeB(y, h, 0, 1);// {12, 23/2};
-	// cout<<"d="<<d<<endl;
+	 cout<<"m="<<endl<<m<<endl;
+	dvec&& d = makeB(y, h, l0, ln);// {12, 23/2};
+	 cout<<"d="<<d<<endl;
 
 	dvec&& l = shuttle(m, d);
 	l[l.size()-1] = ln;
@@ -260,7 +295,8 @@ int main(int argc, char const *argv[])
 		do{
 			cout<<"input "<<x[0]<<"<x<"<<x[x.size()-1]<<":";
 			cin>>a;
-			if ( a != "e") cout<<endl<<"S("<<a<<")="<<Spline(x, y, h, l, stod(a))<<endl;
+			//if ( a != "e") cout<<endl<<"S("<<a<<")="<<Spline(x, y, h, l, stod(a))<<endl;
+			if ( a != "e") cout<<endl<<"S("<<a<<")="<<Spline(x, y, h, l, atof(a.c_str()))<<endl;
 		} while (a != "e");
 	}
 	catch(const char* err)
