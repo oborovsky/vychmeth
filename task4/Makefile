@@ -10,10 +10,16 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 all: spline
 
 clean:
-	rm -f spline *.o #*.sce
+	rm -f spline gendata *.o #*.sce
 
 spline: spline.o
 	g++ $(CPPFLAGS) $^ -o $@
 
 spline.o: spline.cc
+	g++ $(CPPFLAGS) -c $<
+
+gendata: gendata.o
+	g++ $(CPPFLAGS) $^ -o $@
+
+gendata.a: gendata.cc
 	g++ $(CPPFLAGS) -c $<

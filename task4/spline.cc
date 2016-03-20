@@ -16,6 +16,7 @@ using dvec=vector<double>;
 using matrix = vector<dvec>;
 using counter = unsigned int;
 string name = "spline.txt";
+string outfunc = "";
 
 ostream& operator<< (ostream &os, dvec& x)
 {
@@ -32,37 +33,12 @@ ostream& operator<< (ostream &os, dvec& x)
 }
 ostream& operator<< (ostream &os, matrix& m)
 {
-	// for (auto v : m)
-	// {
-	// 	os<<v<<endl;
-	// }
-	for (counter i = 0; i < m.size(); i++)
-	{
-		dvec v = m[i];
-		if( i == 0)
-		{
-		   v.erase(begin(v));
-		   v.push_back(0);
-
-		};
-		if( i == m.size() - 1)
-		{
-			v.pop_back();
-			v.insert(begin(v),0);
-		}
-		os<<v<<endl;
-
-	}
+	dvec a = m[0], b = m[1], c = m[2];
+	os<<"a="<<a<<endl;
+	os<<"b="<<b<<endl;
+	os<<"c="<<c<<endl;
+	
 	return os;
-}
-dvec getColumn(matrix& m, int n)
-{
-	dvec a;
-	for (auto v : m)
-	{
-		a.push_back(v[n]);
-	}
-	return a;
 }
 dvec makeH(dvec& x)
 {
@@ -72,75 +48,61 @@ dvec makeH(dvec& x)
 	{
 		h[i]= x[i] - x[i-1];
 	}
+	h.push_back(0);
 	return h;
 }
 dvec makeB(dvec& y, dvec& h, double l0, double ln)
 {
 	dvec b;
-	counter n = y.size();
-	for (counter i = 1; i < n - 1; i++)
+	const counter n = y.size();
+	double r = 0;
+	counter i = 0;
+
+	for (; i < n - 1; i++)
 	{
-		double r  = 6*(y[i+1] - y[i])/h[i+1] - 6*(y[i] - y[i-1])/h[i];
-		if ( i == 1)
+			switch(i)
 		{
-			// cout<<"y:"<<y[i+1]<<","<<y[i]<<","<<y[i-1]<<endl;		
-		 // 	cout<<"r="<<r<<endl;
+			case 0: r = 6*(y[i+1] - y[i])/h[i+1] - 6*l0; break;
+			default: r  = 6*(y[i+1] - y[i])/h[i+1] - 6*(y[i] - y[i-1])/h[i];
 	 	}
-		if (i == 1) r -= l0*h[i];
-		if (i == n-2)
-		{
-			cout<<"r="<<r<<"ln="<<ln<<endl;
-			 r -= ln*h[i+1];
-			 cout<<"r="<<r<<endl;
-		}
-		if( i == n-2) cout<<"h="<<h[i+1]<<endl;
 		b.push_back(r);
 	}
+	i--;
+	r = 6*ln - 6*(y[i+1] - y[i])/h[i+1];
+	b.push_back(r);
 	return b;
 
 }
 matrix makeMatrix(dvec& h)
 {
-	
 	matrix m;
+	// m[0] = ai, m[1]= bi, m[2]=ci;s
 	counter n = h.size();
+	dvec a,b,c;
 
-	for (counter i = 1; i < n - 1; i++)
+	for (counter i = 0; i < n-1; i++)
 	{
-		dvec row;
-		if ( i == 1 )
-		{
-			row.push_back(0);
-		} 
-		else
-		{
-			row.push_back(h[i]);
-		}			
-		row.push_back(2*(h[i] + h[i+1]));
-		if ( i == n-2) 
-		{
-			row.push_back(0);
-		}
-		else
-		{
-			row.push_back(h[i+1]);
-		}
-		m.push_back(row);
+		a.push_back(h[i]);
+		b.push_back(2*(h[i] + h[i+1]));
+		c.push_back(h[i+1]);
 	}
+	m.push_back(a);
+	m.push_back(b);
+	m.push_back(c);
 	return m;
 }
 dvec shuttle(matrix &m, dvec& d)
 {
-	dvec l(m.size() + 1);
+	dvec l(d.size() + 1);
 	dvec e(l.size());
 	dvec n(l.size());
     //cout<<m.size()<<endl;
 
 	fill(begin(l), begin(l) + m.size() + 1, 0);
 
-	dvec&& a = getColumn(m, 0);
-	dvec&& b = getColumn(m, 1);
-	dvec&& c = getColumn(m, 2);
+	dvec a = m[0];
+	dvec b = m[1];
+	dvec c = m[2];
 	//cout<<a<<endl<<b<<endl<<c<<endl;
 	// cout<<e<<endl<<n<<endl;
 
@@ -150,16 +112,17 @@ dvec shuttle(matrix &m, dvec& d)
 		e[i+1] = -c[i] / k;
 		n[i+1] = (d[i] - a[i]*n[i]) / k;
 	}
-	// cout<<"e="<<e<<endl<<"n="<<n<<endl;
-	for (counter i = l.size()-1; i > 1; i--)
+	cout<<"e="<<e<<endl<<"n="<<n<<endl;
+	for (counter i = l.size()-1; i > 0; i--)
 	{
 		l[i-1] = e[i]*l[i] + n[i];
 	}
+	l.pop_back();
 	return l;
 }
 double Spline(dvec& x, dvec&y, dvec& h, dvec& l, double a)
 {
-	counter i = 0;
+	counter i = 1;
 	counter n = x.size();
 
 	if( a < x[0] || x[n-1] < a) throw "out of range";
@@ -210,6 +173,10 @@ void loadData(dvec& x, dvec& y, double& l0, double& ln)
 	is>>l0;
 	is>>ln;
     // cout<<"l0="<<l0<<endl<<"ln="<<ln<<endl;
+    string str = "";
+    is>>str;
+    cout<<str<<endl;
+    if( str != "") outfunc = str;
 
 }
 // находим значение фукции f по точкам
@@ -238,6 +205,7 @@ void out(map<string, dvec>& opts, string title)
 		os<<setiosflags(ios::scientific)<<setprecision(10)<<"xh="<<opts["xh"]<<";"<<endl;
 	    os<<setiosflags(ios::scientific)<<setprecision(10)<<"yy="<<opts["yy"]<<";"<<endl;
 	    os<<"plot(xh,yy,'r');"<<endl;
+	    if( outfunc != "") os<<outfunc<<endl;
 	   // os<<"plot(x,y,'*');"<<endl;
 	    os<<"xgrid();"<<endl;
 	    os<<"xtitle('"<<title<<"','X', 'Y');"<<endl;
@@ -285,12 +253,9 @@ int main(int argc, char const *argv[])
 	 cout<<"d="<<d<<endl;
 
 	dvec&& l = shuttle(m, d);
-	l[l.size()-1] = ln;
-	l.insert(begin(l),l0);
-	// cout<<"l="<<l<<endl;
-
+	cout<<"l="<<l<<endl;
 	try {
-		makeGraphic("spline",x,y,h,l);
+		 makeGraphic("spline",x,y,h,l);
 		string a = ""; 
 		do{
 			cout<<"input "<<x[0]<<"<x<"<<x[x.size()-1]<<":";
