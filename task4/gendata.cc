@@ -49,9 +49,9 @@ int main(int argc, char const *argv[])
 	for(double i = a; i <= b; i+= h)
 	{
 		if( i != a) os<<" ";
-		os<<ssin(i);
+		os<<eexp(i);
 	}
 	os<<endl;
-	os<<cos(-2)<<endl<<cos(2)<<endl;
+	os<<eexp(-2)<<endl<<eexp(2)<<endl;
 	return 0;
 }
