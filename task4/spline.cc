@@ -262,7 +262,7 @@ int main(int argc, char const *argv[])
 	 // cout<<"d="<<d<<endl;
 
 	dvec&& l = shuttle(m, d);
-	// cout<<"l="<<l<<endl;
+	 cout<<"l="<<l<<endl;
 	try {
 		 makeGraphic("spline",x,y,h,l);
 		 cout<<endl;

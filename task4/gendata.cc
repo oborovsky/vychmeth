@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <cmath>
+#include <cstdlib>
 
 using namespace std;
 using counter = unsigned int;
@@ -20,11 +21,17 @@ struct fexp:func
 	double operator()(double a) const{return exp(a);};
 
 };
+struct cub:func
+{
+	double operator()(double a) const{return pow(a,3);};
+
+};
 fsin ssin;
 fexp eexp;
+cub ccub;
 // map<string,struct func&> ff;
 // ff["sin"] = ssin;
-counter n = 4;
+counter n = 5;
 const double pi = 3.14159265359;
 double a = -2;
 double b = 2;
@@ -49,7 +56,7 @@ int main(int argc, char const *argv[])
 	for(double i = a; i <= b; i+= h)
 	{
 		if( i != a) os<<" ";
-		os<<eexp(i);
+		os<<ccub(i);
 	}
 	os<<endl;
 	os<<eexp(-2)<<endl<<eexp(2)<<endl;
