@@ -222,7 +222,7 @@ void out(map<string, dvec>& opts, string title)
 };
 void makeGraphic(string name, dvec& x, dvec& y, dvec& h, dvec& l)
 {
-	const double hh = 0.01;
+	const double hh = 0.1;
 	dvec xh;
 	for(double a = x[0]; a <= x[x.size()-1]; a += hh)
 	{
