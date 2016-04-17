@@ -5,39 +5,77 @@
 #include <iomanip>
 #include <string>
 #include <exception>
+#include <cstring>
 
 using namespace std;
 
-template <int r, int c >
 class matrix 
 {
-	double m[r][c];
+	int r;
+	int c;
+	double** m = nullptr;
+	matrix(){};
+	double** getmem(int r, int c)
+	{
+		double **mem;
+		mem = new double*[r];
+
+		for (int i = 0; i < r; ++i)
+		{
+			mem[i] = new double[c];	
+		}
+		return mem;
+	}
+	void freemem(int r, int c)
+	{
+		if (m != nullptr)
+		{
+			for (int i = 0; i < r; ++i)
+			{
+				delete[] m[i];
+			}
+		}
+		delete[] m;
+	}
 public:
-	matrix(double arr[r][c])
+	~matrix()
 	{
-		for (int i = 0; i < r; i++)
-		{
-			for (int j = 0; j < c; j++)
-			{
-				m[i][j] = arr[i][j];
-			}
-		}
-	};
-	matrix(double* arr[c])
+		// cout<<"destructor start"<<endl;
+		freemem(r,c);
+		m = nullptr;
+		// cout<<"destructor end"<<endl;
+	}
+	matrix(int _r, int _c, double** arr):r(_r),c(_c),m(arr){};
+	// matrix(int _r, int _c, double arr[][]):r(_r),c(_c)
+	// {
+	// 	m = getmem(r,c);
+	// 	for (int i = 0; i < r; i++)
+	// 	{
+	// 		for (int j = 0; j < c; j++)
+	// 		{
+	// 			m[i][j] = arr[i][j];
+	// 		}
+	// 	}
+	// };
+	// matrix(int _r, int _c, double* arr[]):r(_r),c(_c)
+	// {
+	// 	m = getmem(r,c);
+	// 	for (int i = 0; i < r; i++)
+	// 	{
+	// 		for (int j = 0; j < c; j++)
+	// 		{
+	// 			m[i][j] = arr[i][j];
+	// 		}
+	// 	}
+	// };
+	matrix(int _r, int _c, const char* str):matrix(_r, _c, string(str)){};
+	matrix(int _r, int _c, string str):r(_r),c(_c)
 	{
-		for (int i = 0; i < r; i++)
-		{
-			for (int j = 0; j < c; j++)
-			{
-				m[i][j] = arr[i][j];
-			}
-		}
-	};
-	matrix(const char* str):matrix(string(str)){};
-	matrix(string str)
-	{
+		// cout<<"matrix string"<<endl;
 		int rr = 0,cc = 0;
-		int start = 0, end = 0;
+		unsigned int start = 0, end = 0;
+
+		m = getmem(r,c);
 
 		for (; end < str.size(); end++)
 		{
@@ -71,21 +109,17 @@ public:
 			double cur = stod(chunk);
 			m[rr][cc] = cur;
 		}
+		// cout<<"string end"<<endl;
 	};
-	matrix(matrix<r,c>& _m)
+	matrix(matrix& _m)
 	{
-		// cout<<"const copy"<<endl;
-		for (int i = 0; i < r; ++i)
-		{
-			for (int j = 0; j < c; ++j)
-			{
-				m[i][j] = _m.m[i][j];
-			}
-		}
-
+		r = _m.r;
+		c = _m.c;
+		m = _m.toArray();
 	};
-	matrix()
+	matrix(int _r, int _c):r(_r),c(_c)
 	{
+		m = getmem(r, c);
 		for (int i = 0; i < r; ++i)
 		{
 			for (int j = 0; j < c; ++j)
@@ -94,26 +128,26 @@ public:
 			}
 		}
 	};
-	matrix<r,c>& makeT(int i, int j)
+	matrix& makeT(int i, int j)
 	{
 		if( i >= r && j >= c) throw "out of range";
-		matrix<r,c> &m = makeE();
+		matrix &m = makeE();
 		m.set(i,j,1);
 		m.set(i,i,0);
 		m.set(j,j,0);
 		m.set(j,i,1);
 		return m;
 	};
-	matrix<r,c>& makeR(int i, int j, double rr)
+	matrix& makeR(int i, int j, double rr)
 	{
 		if ( i >= r && j >= c) throw "out of range";
-		matrix<r,c> &m = makeE();
+		matrix &m = makeE();
 		m.set(j,i,rr);
 		return m;
 	}
-	matrix<r,c>& makeE()
+	matrix& makeE()
 	{
-		double res[r][c];
+		double** res = getmem(r,c);
 		for (int i = 0; i < r; ++i)
 		{
 			for (int j = 0; j < c; ++j)
@@ -122,12 +156,17 @@ public:
 				if ( i == j) res[i][j] = 1;
 			}
 		}
-		return *(new matrix<r,c>(res));
+		return *(new matrix(r,c,res));
 	};
-	matrix<r,c>& operator=(matrix<r,c>& _m)
+	matrix& operator=(matrix& _m)
 	{
 		// cout<<"oper="<<endl;
 		if(&_m == this) return *this;
+		if (r != _m.r && c != _m.c)
+		{
+			throw "different rang of matrix";
+		}
+		
 		for (int i = 0; i < r; ++i)
 		{
 			for (int j = 0; j < c; ++j)
@@ -137,9 +176,9 @@ public:
 		}
 		return *this;
 	};
-	matrix<r,c>& operator+(const matrix<r,c>& _m)
+	matrix& operator+(matrix& _m)
 	{
-		double res[r][c];
+		double** res = getmem(r,c);
 		for (int i = 0; i < r; i++)
 		{
 			for (int j = 0; j < c; j++)
@@ -148,7 +187,7 @@ public:
 			}
 		}
 		cout<<"end +"<<endl;
-		return *(new matrix<r,c>(res));
+		return *(new matrix(r,c,res));
 	};
 	// matrix<r,c>& operator*(const matrix<r,c>& _m)
 	// {
@@ -169,14 +208,13 @@ public:
 	// 	}
 	// 	return *(new matrix<r,c>(res));
 	// };
-	template<int cc>
-	matrix<r,cc>& operator*(matrix<c,cc>& _m)
+	matrix& operator*(matrix& _m)
 	{
-		double res[r][cc];
+		double** res = getmem(r, _m.c);
 		double cur = 0;
 		for (int i = 0; i < r; ++i)
 		{
-			for (int k = 0; k < cc; ++k)
+			for (int k = 0; k < _m.c; ++k)
 			{
 				for (int j = 0; j < c; ++j)
 				{
@@ -187,7 +225,7 @@ public:
 			}
 
 		}
-		return *(new matrix<r,cc>(res));
+		return *(new matrix(r,_m.c,res));
 	}
 
 	double get(int i, int j)
@@ -201,6 +239,8 @@ public:
 			m[i][j] = val;
 		}
 	}
+	int getRow(){return r;};
+	int getCol(){return c;};
 	double* operator[](int i)
 	{
 		if( i < r) return m[i];
@@ -208,24 +248,21 @@ public:
 	};
 	double** toArray()
 	{
-		double ** arr = new double*[r];
+		double ** arr = getmem(r,c);
 		for (int i = 0; i < r; ++i)
 		{
-			arr[i] = new double[c];
-			for (int j = 0; j < c; ++j)
-			{
-				arr[i][j] = m[i][j];
-			}
+			memcpy(arr[i], m[i], sizeof(double)*c);
 		}
+		
 		return arr;
 	}
+	friend ostream& operator<<(ostream&, matrix&);
 };
-template <int r, int c>
-ostream& operator<<(ostream &os, matrix<r,c>& m)
+ostream& operator<<(ostream &os, matrix& m)
 {
-	for( int i = 0; i < r; i++)
+	for( int i = 0; i < m.r; i++)
 	{
-		for (int j = 0; j < c; j++)
+		for (int j = 0; j < m.c; j++)
 		{
 			os<<setw(10)<<setprecision(2)<<m[i][j];
 		}

@@ -5,12 +5,13 @@
 
 using namespace std;
 
-template <int r, int c >
-matrix<r,c>& forth(matrix<r,c> & m, matrix<r,1>& b)
+matrix& forthAndBack(matrix & m, matrix& b)
 {
-	matrix<r,c> &res = m;
-	matrix<r,1> &bb = b;
+	matrix &res = m;
+	matrix &bb = b;
 	// matrix<n> &tmp;
+	int r = m.getRow();
+	// int c = m.getCol();
 
 	for (int i = 0; i < r-1; ++i)
 	{
@@ -22,53 +23,53 @@ matrix<r,c>& forth(matrix<r,c> & m, matrix<r,1>& b)
 				max = k;
 			}
 		}
-		matrix<r,c> T = res.makeT(max,i);
+		matrix& T = res.makeT(max,i);
 		res = T*res;
 		bb = T*bb;
-		cout<<res<<endl;
-		cout<<bb<<endl;
+		// cout<<res<<endl;
+		// cout<<bb<<endl;
 		for (int j = i+1; j < r; ++j)
 		{
 			double rr = m[j][i]/m[i][i];
-			matrix<r,c> R = res.makeR(i,j,-rr);
+			matrix& R = res.makeR(i,j,-rr);
 			res = R*res;
 			bb = R*bb;
-			cout<<res<<endl;
-			cout<<bb<<endl; 
+			// cout<<res<<endl;
+			// cout<<bb<<endl; 
 		}
 	}
-	b = bb;
-	return *(new matrix<r,c>(res.toArray()));
+	double x[3];
+	for (int i = r - 1; i >= 0; i--)
+	{
+		double cur = 0;
+		for (int j = r - 1; j > i; j--)
+		{
+			cur += m[i][j]*x[j];
+			// cout<<"i="<<i<<" j="<<j<<"cur="<<cur<<endl;
+		} 
+		x[i] = (bb[i][0] - cur) / m[i][i];
+	}
+
+	for (int i = 0; i < r; ++i)
+	{
+		b[i][0] = x[i];
+	}
+	return b;
 }
 int main(int argc, char const *argv[])
 {
 	try
 	{
-		// int n = 3;
+		int n = 3;
 		// matrix<n> mmm;
-		matrix<3,3> m("2,3,1,5,7,9,1,2,3") ;
-		matrix<3,1> b("9,6,12");
+		matrix m(n,n,"2,3,1,5,7,9,1,2,3") ;
+		matrix b(n,1,"9,6,12");
+		matrix x(n,1);
 		cout<<m<<endl;
 		cout<<b<<endl;
-		matrix<3,3> m2;
-		m2 = forth(m,b);
-		double x[3];
-		for (int i = 2; i >=0; i--)
-		{
-			double cur = 0;
-			for (int j = 2; j > i; j--)
-			{
-				cur += m[i][j]*x[j];
-				cout<<"i="<<i<<" j="<<j<<"cur="<<cur<<endl;
-			} 
-			x[i] = (b[i][0] - cur) / m[i][i];
-		}
-		for (auto v : x)
-		{
-			cout<<v<<endl;
-		}
-		// cout<<"result:"<<endl<<m2<<endl<<b<<endl;
-
+		// matrix m2(3,3);
+		x = forthAndBack(m,b);
+		cout<<x<<endl;
 
 	}
 	catch(string e)

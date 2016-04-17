@@ -10,10 +10,16 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 all: lu
 
 clean:
-	rm -f lu *.o #*.sce
+	rm -f lu test e *.o #*.sce
 
 lu: lu.o
 	$(CC) $(CPPFLAGS) $^ -o $@
 
 lu.o: lu.cc matrix.h
+	$(CC) $(CPPFLAGS) -c $<
+
+test: test.o
+	$(CC) $(CPPFLAGS) $^ -o $@
+
+test.o: test.cc
 	$(CC) $(CPPFLAGS) -c $<
