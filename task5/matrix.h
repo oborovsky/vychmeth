@@ -206,7 +206,7 @@ ostream& operator<<(ostream &os, matrix<n>& m)
 	{
 		for (int j = 0; j < n; j++)
 		{
-			os<<setw(3)<<m[i][j];
+			os<<setw(10)<<setprecision(2)<<m[i][j];
 		}
 		os<<endl;
 	}

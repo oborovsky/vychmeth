@@ -5,34 +5,45 @@
 
 using namespace std;
 
+template <int n>
+matrix<n>& forth(matrix<n> & m)
+{
+	matrix<n> &res = m;
+	// matrix<n> &tmp;
+
+	for (int i = 0; i < n-1; ++i)
+	{
+		int max = i;
+		for (int k = i; k < n; ++k)
+		{
+			if(res[k][i] > res[max][i] )
+			{
+				max = k;
+			}
+		}
+		matrix<n> T = res.makeT(max,i);
+		res = T*res;
+		cout<<res<<endl;
+		for (int j = i+1; j < n; ++j)
+		{
+			double r = m[j][i]/m[i][i];
+			matrix<n> R = res.makeR(i,j,-r);
+			res = R*res;
+			cout<<res<<endl; 
+		}
+	}
+	return *(new matrix<n>(res.toArray()));
+}
 int main(int argc, char const *argv[])
 {
 	try
 	{
-		matrix<3> m("1,0,0,0,1,0,0,0,1") ;
-		matrix<3> m2("1,1,1,2,2,2,3,3,3");
-		// m.set(0,0,1);
-		// m.set(0,1,0);
-		// m.set(1,0,0);
-		// m.set(1,1,1);
-		// m[0][0] = 1;
-		// m[0][1] = 0;
-		// m[1][0] = 0;
-		// m[1][1] = 1;
-		// m2[0][0] = 0;
-		// m2[0][1] = 1;
-		// m2[1][0] = 1;
-		// m2[1][1] = 0;
-		// mm = m + m2;
-		 matrix<3> m3 = m.makeR(0,1,2);
-		 cout<<m3<<endl;
-		 cout<<m<<endl;
-		 cout<<m3*m<<endl;
-		 cout<<m2*m3<<endl;
-		 double** arr = m.toArray();
-		 matrix<3> m4(arr);
-		 m4[0][0] = 4;
-		 cout<<m4<<endl;
+		matrix<3> m("1,2,3,4,5,6,7,8,11") ;
+		cout<<m<<endl;
+		matrix<3> m2;
+		m2 = forth(m);
+		cout<<"result:"<<endl<<m2<<endl;
+
 
 	}
 	catch(string e)
