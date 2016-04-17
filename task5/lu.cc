@@ -5,44 +5,69 @@
 
 using namespace std;
 
-template <int n>
-matrix<n>& forth(matrix<n> & m)
+template <int r, int c >
+matrix<r,c>& forth(matrix<r,c> & m, matrix<r,1>& b)
 {
-	matrix<n> &res = m;
+	matrix<r,c> &res = m;
+	matrix<r,1> &bb = b;
 	// matrix<n> &tmp;
 
-	for (int i = 0; i < n-1; ++i)
+	for (int i = 0; i < r-1; ++i)
 	{
 		int max = i;
-		for (int k = i; k < n; ++k)
+		for (int k = i; k < r; ++k)
 		{
 			if(res[k][i] > res[max][i] )
 			{
 				max = k;
 			}
 		}
-		matrix<n> T = res.makeT(max,i);
+		matrix<r,c> T = res.makeT(max,i);
 		res = T*res;
+		bb = T*bb;
 		cout<<res<<endl;
-		for (int j = i+1; j < n; ++j)
+		cout<<bb<<endl;
+		for (int j = i+1; j < r; ++j)
 		{
-			double r = m[j][i]/m[i][i];
-			matrix<n> R = res.makeR(i,j,-r);
+			double rr = m[j][i]/m[i][i];
+			matrix<r,c> R = res.makeR(i,j,-rr);
 			res = R*res;
-			cout<<res<<endl; 
+			bb = R*bb;
+			cout<<res<<endl;
+			cout<<bb<<endl; 
 		}
 	}
-	return *(new matrix<n>(res.toArray()));
+	b = bb;
+	return *(new matrix<r,c>(res.toArray()));
 }
 int main(int argc, char const *argv[])
 {
 	try
 	{
-		matrix<3> m("1,2,3,4,5,6,7,8,11") ;
+		// int n = 3;
+		// matrix<n> mmm;
+		matrix<3,3> m("2,3,1,5,7,9,1,2,3") ;
+		matrix<3,1> b("9,6,12");
 		cout<<m<<endl;
-		matrix<3> m2;
-		m2 = forth(m);
-		cout<<"result:"<<endl<<m2<<endl;
+		cout<<b<<endl;
+		matrix<3,3> m2;
+		m2 = forth(m,b);
+		double x[3];
+		for (int i = 2; i >=0; i--)
+		{
+			double cur = 0;
+			for (int j = 2; j > i; j--)
+			{
+				cur += m[i][j]*x[j];
+				cout<<"i="<<i<<" j="<<j<<"cur="<<cur<<endl;
+			} 
+			x[i] = (b[i][0] - cur) / m[i][i];
+		}
+		for (auto v : x)
+		{
+			cout<<v<<endl;
+		}
+		// cout<<"result:"<<endl<<m2<<endl<<b<<endl;
 
 
 	}

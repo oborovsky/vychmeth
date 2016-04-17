@@ -8,26 +8,26 @@
 
 using namespace std;
 
-template <int n>
+template <int r, int c >
 class matrix 
 {
-	double m[n][n];
+	double m[r][c];
 public:
-	matrix(double arr[n][n])
+	matrix(double arr[r][c])
 	{
-		for (int i = 0; i < n; i++)
+		for (int i = 0; i < r; i++)
 		{
-			for (int j = 0; j < n; j++)
+			for (int j = 0; j < c; j++)
 			{
 				m[i][j] = arr[i][j];
 			}
 		}
 	};
-	matrix(double* arr[n])
+	matrix(double* arr[c])
 	{
-		for (int i = 0; i < n; i++)
+		for (int i = 0; i < r; i++)
 		{
-			for (int j = 0; j < n; j++)
+			for (int j = 0; j < c; j++)
 			{
 				m[i][j] = arr[i][j];
 			}
@@ -36,7 +36,7 @@ public:
 	matrix(const char* str):matrix(string(str)){};
 	matrix(string str)
 	{
-		int r = 0,c = 0;
+		int rr = 0,cc = 0;
 		int start = 0, end = 0;
 
 		for (; end < str.size(); end++)
@@ -48,18 +48,18 @@ public:
 			// cout<<chunk<<endl;
 			double cur = stod(chunk);
 			// cout<<"r="<<r<<" ,c="<<c<<endl;
-			m[r][c] = cur;
+			m[rr][cc] = cur;
 			start = end + 1;
-			if ( c + 1< n)
+			if (cc + 1 < c)
 			{
-				 c++;
+				 cc++;
 			}
 			else 
 			{
-				if( r + 1 < n)
+				if(rr + 1 < r)
 				{
-					r++;
-					c = 0;
+					rr++;
+					cc = 0;
 				}
 				else throw "out of range";
 			}
@@ -69,15 +69,15 @@ public:
 			// cout<<"start="<<start<<", end ="<<end<<endl;
 			string chunk = str.substr(start, end-start);
 			double cur = stod(chunk);
-			m[r][c] = cur;
+			m[rr][cc] = cur;
 		}
 	};
-	matrix(matrix<n>& _m)
+	matrix(matrix<r,c>& _m)
 	{
 		// cout<<"const copy"<<endl;
-		for (int i = 0; i < n; ++i)
+		for (int i = 0; i < r; ++i)
 		{
-			for (int j = 0; j < n; ++j)
+			for (int j = 0; j < c; ++j)
 			{
 				m[i][j] = _m.m[i][j];
 			}
@@ -86,112 +86,133 @@ public:
 	};
 	matrix()
 	{
-		for (int i = 0; i < n; ++i)
+		for (int i = 0; i < r; ++i)
 		{
-			for (int j = 0; j < n; ++j)
+			for (int j = 0; j < c; ++j)
 			{
 				m[i][j] = 0;	
 			}
 		}
 	};
-	matrix<n>& makeT(int i, int j)
+	matrix<r,c>& makeT(int i, int j)
 	{
-		if( i >= n && j >= n) throw "out of range";
-		matrix<n> &m = makeE();
+		if( i >= r && j >= c) throw "out of range";
+		matrix<r,c> &m = makeE();
 		m.set(i,j,1);
 		m.set(i,i,0);
 		m.set(j,j,0);
 		m.set(j,i,1);
 		return m;
 	};
-	matrix<n>& makeR(int i, int j, double r)
+	matrix<r,c>& makeR(int i, int j, double rr)
 	{
-		if ( i >= n && j >= n) throw "out of range";
-		matrix<n> &m = makeE();
-		m.set(j,i,r);
+		if ( i >= r && j >= c) throw "out of range";
+		matrix<r,c> &m = makeE();
+		m.set(j,i,rr);
 		return m;
 	}
-	matrix<n>& makeE()
+	matrix<r,c>& makeE()
 	{
-		double res[n][n];
-		for (int i = 0; i < n; ++i)
+		double res[r][c];
+		for (int i = 0; i < r; ++i)
 		{
-			for (int j = 0; j < n; ++j)
+			for (int j = 0; j < c; ++j)
 			{
 				res[i][j] = 0;
 				if ( i == j) res[i][j] = 1;
 			}
 		}
-		return *(new matrix<n>(res));
+		return *(new matrix<r,c>(res));
 	};
-	matrix<n>& operator=(matrix<n>& _m)
+	matrix<r,c>& operator=(matrix<r,c>& _m)
 	{
 		// cout<<"oper="<<endl;
 		if(&_m == this) return *this;
-		for (int i = 0; i < n; ++i)
+		for (int i = 0; i < r; ++i)
 		{
-			for (int j = 0; j < n; ++j)
+			for (int j = 0; j < c; ++j)
 			{
 				m[i][j] = _m.m[i][j];
 			}
 		}
 		return *this;
 	};
-	matrix<n>& operator+(const matrix<n>& _m)
+	matrix<r,c>& operator+(const matrix<r,c>& _m)
 	{
-		double res[n][n];
-		for (int i = 0; i < n; i++)
+		double res[r][c];
+		for (int i = 0; i < r; i++)
 		{
-			for (int j = 0; j < n; j++)
+			for (int j = 0; j < c; j++)
 			{
 				res[i][j] = m[i][j] + _m.m[i][j];
 			}
 		}
 		cout<<"end +"<<endl;
-		return *(new matrix<n>(res));
+		return *(new matrix<r,c>(res));
 	};
-	matrix<n>& operator*(const matrix<n>& _m)
+	// matrix<r,c>& operator*(const matrix<r,c>& _m)
+	// {
+	// 	double res[r][c];
+	// 	double cur = 0;
+	// 	for (int i = 0; i < r; ++i)
+	// 	{
+	// 		for (int k = 0; k < c; ++k)
+	// 		{
+	// 			for (int j = 0; j < c; ++j)
+	// 			{
+	// 				cur += m[i][j]*_m.m[j][k];
+	// 			}
+	// 			res[i][k] = cur;
+	// 			cur = 0;
+	// 		}
+
+	// 	}
+	// 	return *(new matrix<r,c>(res));
+	// };
+	template<int cc>
+	matrix<r,cc>& operator*(matrix<c,cc>& _m)
 	{
-		double res[n][n];
+		double res[r][cc];
 		double cur = 0;
-		for (int i = 0; i < n; ++i)
+		for (int i = 0; i < r; ++i)
 		{
-			for (int k = 0; k < n; ++k)
+			for (int k = 0; k < cc; ++k)
 			{
-				for (int j = 0; j < n; ++j)
+				for (int j = 0; j < c; ++j)
 				{
-					cur += m[i][j]*_m.m[j][k];
+					cur += m[i][j]*_m[j][k];
 				}
 				res[i][k] = cur;
 				cur = 0;
 			}
 
 		}
-		return *(new matrix<n>(res));
+		return *(new matrix<r,cc>(res));
 	}
+
 	double get(int i, int j)
 	{
 		return m[i][j];
 	}
 	void set(int i, int j, double val)
 	{
-		if( i < n && j < n)
+		if( i < r && j < c)
 		{
 			m[i][j] = val;
 		}
 	}
 	double* operator[](int i)
 	{
-		if( i < n) return m[i];
+		if( i < r) return m[i];
 		return nullptr;
 	};
 	double** toArray()
 	{
-		double ** arr = new double*[n];
-		for (int i = 0; i < n; ++i)
+		double ** arr = new double*[r];
+		for (int i = 0; i < r; ++i)
 		{
-			arr[i] = new double[n];
-			for (int j = 0; j < n; ++j)
+			arr[i] = new double[c];
+			for (int j = 0; j < c; ++j)
 			{
 				arr[i][j] = m[i][j];
 			}
@@ -199,12 +220,12 @@ public:
 		return arr;
 	}
 };
-template <int n>
-ostream& operator<<(ostream &os, matrix<n>& m)
+template <int r, int c>
+ostream& operator<<(ostream &os, matrix<r,c>& m)
 {
-	for( int i = 0; i < n; i++)
+	for( int i = 0; i < r; i++)
 	{
-		for (int j = 0; j < n; j++)
+		for (int j = 0; j < c; j++)
 		{
 			os<<setw(10)<<setprecision(2)<<m[i][j];
 		}
