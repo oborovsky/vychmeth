@@ -15,7 +15,7 @@ clean:
 lu: lu.o
 	$(CC) $(CPPFLAGS) $^ -o $@
 
-lu.o: lu.cc matrix.h
+lu.o: lu.cc matrix.h utilites.h
 	$(CC) $(CPPFLAGS) -c $<
 
 test: test.o

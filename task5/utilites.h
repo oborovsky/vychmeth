@@ -39,20 +39,26 @@ void loadData(dvec& x, dvec& y, int& k)
 		cout<<"невозможно открыть файл"<<endl;
 		exit(1);
 	}
-	double a, b;
-	is>>a;
+	// double a, b;
+//	is>>a;
 	// cout<<"a="<<a<<endl;
-	is>>b;
+	// is>>b;
 	// cout<<"b="<<b<<endl;
-	counter n;
+	counter n = 0;
 	is>>n;
 	// cout<<"n="<<n<<endl;
-	double h = (b - a)/ (n-1);
-	for (counter i = 0; i < n-1; i++)
+	// double h = (b - a)/ (n-1);
+	for (counter i = 0; i < n; i++)
 	{
-		x.push_back(a + i*h);
+		double r;
+		is>>r;
+		x.push_back(r);
 	}
-	x.push_back(b);
+	// for (counter i = 0; i < n-1; i++)
+	// {
+	// 	x.push_back(a + i*h);
+	// }
+	// x.push_back(b);
 	 // cout<<"x="<<x<<endl;
 	for (counter i = 0; i < n; i++)
 	{
@@ -62,18 +68,36 @@ void loadData(dvec& x, dvec& y, int& k)
 	}
 	 // cout<<"y="<<y<<endl;
 	is>>k;
-    // cout<<"l0="<<l0<<endl<<"ln="<<ln<<endl;
     string str = "";
     is>>str;
     // cout<<str<<endl;
     if( str != "") outfunc = str;
-   
+    str = "";
     while(is.good())
     {
-    	double r=0;
-    	is>>r;
-    	result.push_back(r);
+    	is>>str;
+	    if( str != "") outfunc += "\n" + str;
+	    str = "";
     }
 	// cout<<"x="<<result<<endl;
+};
+void out(dvec& c,dvec& x)
+{
+	string title = "lu";
+	string name = "lu";
+	name = name + ".sce";
+	ofstream os(name);
+	if (!os)
+	{
+		cout<<"невозможно создать файл"<<endl;
+		exit(1);
+	}
+	os<<setiosflags(ios::scientific)<<setprecision(10)<<"x="<<x<<";"<<endl;
+	os<<"p=poly("<<c<<",'k','c');"<<endl;
+	if( outfunc != "") os<<outfunc<<endl;
+	   // os<<"plot(x,y,'*');"<<endl;
+	    os<<"xgrid();"<<endl;
+	    os<<"xtitle('"<<title<<"','X', 'Y');"<<endl;
+
 }
 #endif

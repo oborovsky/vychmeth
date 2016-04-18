@@ -51,17 +51,17 @@ int main(int argc, char const *argv[])
 
 	for (int i = 0; i < n; ++i)
 	{
-		double random = pow(-1,i)*e*distr(genr);
-		double r = f(a+i*h) + random;
-		os<<r<<" ";
-		cout<<"r="<<random<<" ";
-	}
-	os<<endl;
-	for (int i = 0; i < n; ++i)
-	{
 		double r = a+i*h;
 		os<<r<<" ";
 	}
 	os<<endl;
-	cout<<PI<<endl;
+	for (int i = 0; i < n; ++i)
+	{
+		double random = pow(-1,i)*e*distr(genr);
+		double r = f(a+i*h) + random;
+		os<<r<<" ";
+		// cout<<"r="<<random<<" ";
+	}
+	os<<endl;
+	
 }

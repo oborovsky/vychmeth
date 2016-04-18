@@ -115,15 +115,15 @@ int main(int argc, char const *argv[])
 		dvec x, y;
 		int k;
 		loadData(x, y, k);
-		cout<<x<<endl;
-		cout<<y<<endl;
-		cout<<k<<endl;
+		// cout<<x<<endl;
+		// cout<<y<<endl;
+		// cout<<k<<endl;
 		matrix m(k,k);
 		matrix b(k,1);
 		int n = x.size();
 		makeMatrix(m, b, x, y, n, k);
-		cout<<m<<endl;
-		cout<<b<<endl;
+		// cout<<m<<endl;
+		// cout<<b<<endl;
 		matrix c(k,1);
 		c = forthAndBack(m,b);
 		// cout<<c<<endl;
@@ -153,11 +153,12 @@ int main(int argc, char const *argv[])
 		double dk = 0;
 		for (int i = 0; i < n; ++i)
 		{
-			dk += pow(P(x[i]) - y[i],2);
+			dk += pow(abs(P(x[i]) - y[i]),2);
 		}
 		dk /= n;
 		dk = sqrt(dk);
 		cout<<"dk="<<dk<<endl;
+		out(cc, x);
 
 	}
 	catch(string e)
