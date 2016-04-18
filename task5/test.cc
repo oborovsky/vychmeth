@@ -1,33 +1,67 @@
 #include <cstdlib>
 #include <iostream>
 #include <iomanip>
+#include <vector>
+#include <sstream>
+#include <string>
+#include <fstream>
+#include <functional>
+#include <random>
 
 using namespace std;
+using dvec=vector<double>;
+
+double PI = acos(-1);
+auto f = [](double a)->double {return sin(PI*a/2);};
+int n = 10;
+double a = 0;
+double b = 1;
+double h = (b - a)/(n-1);
+double e = 0.01;
+
+ostream& operator<< (ostream &os, dvec& x)
+{
+	stringstream s;
+	s<<'[';
+	for(auto i : x) 
+	{
+		s<<i<<',';
+	}
+	string str = s.str();
+	str[str.size()-1] =']';
+	os<<str;
+	return os;
+};
 
 int main(int argc, char const *argv[])
 {
-	int r  = 6;
-	int c = 6;
-	double** arr = new double*[r];
-	for (int i = 0; i < r; ++i)
+	string name = "test.txt";
+	if (argc > 1) 
 	{
-		arr[i] = new double[c];
+		name = string(argv[1]);
 	}
-	for (int i = 0; i < r; ++i)
+	ofstream os(name);
+	if(!os) 
 	{
-		for (int j = 0; j < c; ++j)
-		{
-			arr[i][j] = i*j;
-		}
-	}
-	for (int i = 0; i < r; ++i)
+		cout<<"невозможно создать файл"<<endl;
+		exit(1);
+	};
+	default_random_engine genr;
+	uniform_real_distribution<double> distr(0.0, 1.0);
+
+	for (int i = 0; i < n; ++i)
 	{
-		for (int j = 0; j < c; ++j)
-		{
-			cout<<setw(4)<<arr[i][j]<<" ";
-			/* code */
-		}
-		cout<<endl;
+		double random = pow(-1,i)*e*distr(genr);
+		double r = f(a+i*h) + random;
+		os<<r<<" ";
+		cout<<"r="<<random<<" ";
 	}
-	return 0;
+	os<<endl;
+	for (int i = 0; i < n; ++i)
+	{
+		double r = a+i*h;
+		os<<r<<" ";
+	}
+	os<<endl;
+	cout<<PI<<endl;
 }

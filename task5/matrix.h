@@ -189,25 +189,6 @@ public:
 		cout<<"end +"<<endl;
 		return *(new matrix(r,c,res));
 	};
-	// matrix<r,c>& operator*(const matrix<r,c>& _m)
-	// {
-	// 	double res[r][c];
-	// 	double cur = 0;
-	// 	for (int i = 0; i < r; ++i)
-	// 	{
-	// 		for (int k = 0; k < c; ++k)
-	// 		{
-	// 			for (int j = 0; j < c; ++j)
-	// 			{
-	// 				cur += m[i][j]*_m.m[j][k];
-	// 			}
-	// 			res[i][k] = cur;
-	// 			cur = 0;
-	// 		}
-
-	// 	}
-	// 	return *(new matrix<r,c>(res));
-	// };
 	matrix& operator*(matrix& _m)
 	{
 		double** res = getmem(r, _m.c);
