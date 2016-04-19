@@ -158,7 +158,7 @@ int main(int argc, char const *argv[])
 		dk /= n;
 		dk = sqrt(dk);
 		cout<<"dk="<<dk<<endl;
-		out(cc, x);
+		out(cc, x,y);
 
 	}
 	catch(string e)

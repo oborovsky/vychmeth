@@ -81,7 +81,7 @@ void loadData(dvec& x, dvec& y, int& k)
     }
 	// cout<<"x="<<result<<endl;
 };
-void out(dvec& c,dvec& x)
+void out(dvec& c,dvec& x,dvec& y)
 {
 	string title = "lu";
 	string name = "lu";
@@ -93,9 +93,11 @@ void out(dvec& c,dvec& x)
 		exit(1);
 	}
 	os<<setiosflags(ios::scientific)<<setprecision(10)<<"x="<<x<<";"<<endl;
+	os<<setiosflags(ios::scientific)<<setprecision(10)<<"y="<<y<<";"<<endl;
 	os<<"p=poly("<<c<<",'k','c');"<<endl;
 	if( outfunc != "") os<<outfunc<<endl;
 	   // os<<"plot(x,y,'*');"<<endl;
+		os<<"plot(x,y,'b*');"<<endl;
 	    os<<"xgrid();"<<endl;
 	    os<<"xtitle('"<<title<<"','X', 'Y');"<<endl;
 

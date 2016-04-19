@@ -12,10 +12,10 @@ using namespace std;
 using dvec=vector<double>;
 
 double PI = acos(-1);
-auto f = [](double a)->double {return sin(PI*a/2);};
+auto f = [](double a)->double {return 1+pow(a,3);};
 int n = 10;
-double a = 0;
-double b = 1;
+double a = 4;
+double b = 5;
 double h = (b - a)/(n-1);
 double e = 0.01;
 
@@ -52,14 +52,16 @@ int main(int argc, char const *argv[])
 	for (int i = 0; i < n; ++i)
 	{
 		double r = a+i*h;
-		os<<r<<" ";
+		os<<r;
+		if ( i != n-1) os<<" ";
 	}
 	os<<endl;
 	for (int i = 0; i < n; ++i)
 	{
 		double random = pow(-1,i)*e*distr(genr);
 		double r = f(a+i*h) + random;
-		os<<r<<" ";
+		os<<r;
+		if ( i != n-1) os<<" ";
 		// cout<<"r="<<random<<" ";
 	}
 	os<<endl;
