@@ -14,7 +14,7 @@ using matrix = vector<dvec>;
 counter iters = 0;
 counter maxN = 10;
 string name = "data.txt";
-double bound = 0.0001;
+double bound = 0.000000001;
 
 ostream& operator<< (ostream &os, dvec& x)
 {
@@ -117,6 +117,7 @@ double norma(dvec& v)
 	}
 	return sqrt(res);
 }
+//решение линейного ур. Ax=b методом релаксаций
 dvec relaxation(matrix& A, dvec& b, dvec& x0, double e)
 {
 	counter n = x0.size();
@@ -151,6 +152,7 @@ dvec relaxation(matrix& A, dvec& b, dvec& x0, double e)
 	}
 	return x2;
 }
+// собственные числа матрицы методом Якоби
 double ND(matrix& A)
 {
 	double res = 0;
@@ -285,6 +287,7 @@ void methodJacobi(matrix& A, double e)
 		// cout<<"ND(A)="<<ND(A)<<endl;
 	}
 }
+//нахождение собственных векторов методом Чуркина
 bool in (int j, vector<int>& index)
 {
 	for(auto i : index)
@@ -295,12 +298,12 @@ bool in (int j, vector<int>& index)
 }
 int getNotNull(matrix& A, vector<int>& index, int i)
 {
-	cout<<"index="<<index<<endl;
+	// cout<<"index="<<index<<endl;
 	counter n = A[0].size();
 
 	for(counter j = 0; j < n; j++)
 	{
-		cout<<"i="<<i<<",j="<<j<<endl;
+		// cout<<"i="<<i<<",j="<<j<<endl;
 		if (in(j, index)) continue;
 		if (abs(A[i][j]) > 0) return j;
 	}
@@ -308,7 +311,7 @@ int getNotNull(matrix& A, vector<int>& index, int i)
 }
 int getIndex(vector<int>& index, counter n)
 {
-	cout<<"index="<<index<<endl;
+	// cout<<"index="<<index<<endl;
 	for(counter i = 0; i < n; i++)
 	{
 		if (!in(i,index)) return i;
@@ -317,45 +320,67 @@ int getIndex(vector<int>& index, counter n)
 }
 void trfMatrix(matrix& A, matrix& I, counter j, vector<int>& index, counter ii)
 {
-	cout<<"trfMatrix"<<endl;
 	counter n = A[0].size();
-	cout<<"index="<<index<<endl;
-	cout<<"ii="<<ii<<endl;
-	cout<<"j="<<j<<endl;
+	// cout<<"trfMatrix"<<endl;
+	// cout<<"index="<<index<<endl;
+	// cout<<"ii="<<ii<<endl;
+	// cout<<"j="<<j<<endl;
 
 	double a = A[ii][j];
-	cout<<"a="<<a<<endl;
+	// cout<<"a="<<a<<endl;
 	for (counter i = 0; i < n; ++i)
 	{
 		if (in(i,index))continue;
 		double b = A[ii][i];
 		if (b == 0) continue;
-		cout<<"i="<<i<<endl;
-		cout<<"b="<<b<<endl;
-		cout<<"ii="<<ii<<endl;
+		// cout<<"i="<<i<<endl;
+		// cout<<"b="<<b<<endl;
+		// cout<<"ii="<<ii<<endl;
 		for (int k = ii; k >= 0; k-=1)
 		{
-			cout<<"k="<<k<<endl;
+			// cout<<"k="<<k<<endl;
 			A[k][i] += -(b/a)*A[k][j];
 		}
-		cout<<"AL="<<A<<endl;
+		// cout<<"AL="<<endl<<A<<endl;
 		for( int k = n-1; k >= 0; k--)
 		{
 			I[k][i] += -(b/a)*I[k][j];
 		}
-		cout<<"I="<<I<<endl;
+		// cout<<"I="<<endl<<I<<endl;
 	}
+}
+int searchNull(matrix& A)
+{
+	// cout<<"searchNull"<<endl;
+	counter n = A[0].size();
+	for (counter i = 0; i < n; ++i)
+	{
+		bool flag = true;
+		for (counter j = 0; j < n; ++j)
+		{	
+			// cout<<"A["<<j<<"]["<<i<<"]="<<A[j][i]<<endl;
+			if(abs(A[j][i]) > bound)
+			{
+				flag = false;
+				break;
+			}
+			
+		}
+		// cout<<"flag="<<flag<<endl;
+		if ( flag) return i;
+	}
+	return n;
 }
 dvec getVector(matrix& A, double l)
 {
 	matrix AL = A;
 	counter n = A[0].size();
-	cout<<"l="<<l<<endl;
+	// cout<<"l="<<l<<endl;
 	for (counter i = 0; i < n; ++i)
 	{
 		AL[i][i] -= l;
 	}
-	cout<<"AL="<<AL<<endl;
+	// cout<<"AL="<<endl<<AL<<endl;
 	matrix I;
 	for (counter i = 0; i < n; ++i)
 	{
@@ -367,26 +392,37 @@ dvec getVector(matrix& A, double l)
 		}
 		I.push_back(tmp);
 	}
-	cout<<"I="<<I<<endl;
+	// cout<<"I="<<endl<<I<<endl;
 	vector<int> index;
 	counter j;
 	for(counter i = n-1; i >0; i--)
 	{
 		j = getNotNull(AL, index, i);
-		cout<<"jj="<<j<<endl;
+		// cout<<"jj="<<j<<endl;
 		if ( j == n) throw "bad index from getNotNull";
 		index.push_back(j);
 		trfMatrix(AL,I,j,index,i);
+		j = searchNull(AL);
+		if(j != n)
+		{ 
+			break;
+		}
+		else 
+		{
+			j = n;
+		}
 	}
-	j = getIndex(index, n);
+	if( j == n) j = getIndex(index, n);
+	// j = getIndex(index, n);
 	if( j == n) throw "bad index from getIndex";
 	dvec res;
 	for (counter i = 0; i < n; ++i)
 	{
-		res.push_back(2*I[i][j]);
+		res.push_back(I[i][j]);
 	}
 	return res;
 }
+
 int main(int argc, char const *argv[])
 {
 	if (argc > 1) 
@@ -398,7 +434,7 @@ int main(int argc, char const *argv[])
 	dvec b;
 	double e;
 	loadData(A, b, e);
-	cout<<"A="<<A<<endl;
+	cout<<"A="<<endl<<A<<endl;
 	cout<<"b="<<b<<endl;
 	cout<<"e="<<e<<endl;
 	dvec res = relaxation(A, b, b, e);
@@ -407,26 +443,23 @@ int main(int argc, char const *argv[])
 	matrix AA = A;
 	methodJacobi(AA,e);
 	counter n = AA[0].size();
+
 	for (counter i = 0; i < n; ++i)
 	{
 		
-		cout<<" l"<<i+1<<"="<<AA[i][i];
-	}
-	cout<<endl;
-    matrix B={{0.333333,0.333333,0},{0.666666,0,0.666666},{0,0.666666,0.333333}};
-    cout<<"B="<<B<<endl;
-    try
-    {
-    	double l = 1.0/3.0;
-    	cout<<"l="<<l<<endl;
-	    dvec v = getVector(B,l);
-		cout<<"v="<<v<<endl;
-	}
-	catch(const char* e)
-	{
-		cout<<"error:"<<e<<endl;
+		cout<<" l"<<i+1<<"="<<AA[i][i]<<endl;
+		try
+	    {
+	    	double l = AA[i][i];
+		    dvec v = getVector(A,l);
+			cout<<"v"<<i+1<<"="<<v<<endl;
+		}
+		catch(const char* e)
+		{
+			cout<<"error:"<<e<<endl;
+		}
 	}
 
-	cout<<"number iteration: "<<iters<<endl;
+	// cout<<"number iteration: "<<iters<<endl;
 	return 0;
 }
