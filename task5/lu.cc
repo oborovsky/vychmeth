@@ -12,9 +12,7 @@ matrix& forthAndBack(matrix & m, matrix& b)
 {
 	matrix &res = m;
 	matrix &bb = b;
-	// matrix<n> &tmp;
 	int r = m.getRow();
-	// int c = m.getCol();
 
 	for (int i = 0; i < r-1; ++i)
 	{
@@ -26,19 +24,13 @@ matrix& forthAndBack(matrix & m, matrix& b)
 				max = k;
 			}
 		}
-		matrix& T = res.makeT(max,i);
-		res = T*res;
-		bb = T*bb;
-		// cout<<res<<endl;
-		// cout<<bb<<endl;
+		res.transpose(max, i);
+		bb.transpose(max,i);
 		for (int j = i+1; j < r; ++j)
 		{
 			double rr = m[j][i]/m[i][i];
-			matrix& R = res.makeR(i,j,-rr);
-			res = R*res;
-			bb = R*bb;
-			// cout<<res<<endl;
-			// cout<<bb<<endl; 
+			res.addRow(i,j,-rr);
+			bb.addRow(i,j,-rr);
 		}
 	}
 	double x[r];
@@ -48,7 +40,6 @@ matrix& forthAndBack(matrix & m, matrix& b)
 		for (int j = r - 1; j > i; j--)
 		{
 			cur += m[i][j]*x[j];
-			// cout<<"i="<<i<<" j="<<j<<"cur="<<cur<<endl;
 		} 
 		x[i] = (bb[i][0] - cur) / m[i][i];
 	}
@@ -108,25 +99,18 @@ int main(int argc, char const *argv[])
 	if (argc > 1) 
 	{
 		name = string(argv[1]);
-		// cout<<name<<endl;
 	}
 	try
 	{
 		dvec x, y;
 		int k;
 		loadData(x, y, k);
-		// cout<<x<<endl;
-		// cout<<y<<endl;
-		// cout<<k<<endl;
 		matrix m(k,k);
 		matrix b(k,1);
 		int n = x.size();
 		makeMatrix(m, b, x, y, n, k);
-		// cout<<m<<endl;
-		// cout<<b<<endl;
 		matrix c(k,1);
 		c = forthAndBack(m,b);
-		// cout<<c<<endl;
 		dvec cc;
 		for (int i = 0; i < k; ++i)
 		{

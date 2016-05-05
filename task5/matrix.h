@@ -6,6 +6,7 @@
 #include <string>
 #include <exception>
 #include <cstring>
+#include <functional>
 
 using namespace std;
 
@@ -40,38 +41,13 @@ class matrix
 public:
 	~matrix()
 	{
-		// cout<<"destructor start"<<endl;
 		freemem(r,c);
 		m = nullptr;
-		// cout<<"destructor end"<<endl;
 	}
 	matrix(int _r, int _c, double** arr):r(_r),c(_c),m(arr){};
-	// matrix(int _r, int _c, double arr[][]):r(_r),c(_c)
-	// {
-	// 	m = getmem(r,c);
-	// 	for (int i = 0; i < r; i++)
-	// 	{
-	// 		for (int j = 0; j < c; j++)
-	// 		{
-	// 			m[i][j] = arr[i][j];
-	// 		}
-	// 	}
-	// };
-	// matrix(int _r, int _c, double* arr[]):r(_r),c(_c)
-	// {
-	// 	m = getmem(r,c);
-	// 	for (int i = 0; i < r; i++)
-	// 	{
-	// 		for (int j = 0; j < c; j++)
-	// 		{
-	// 			m[i][j] = arr[i][j];
-	// 		}
-	// 	}
-	// };
 	matrix(int _r, int _c, const char* str):matrix(_r, _c, string(str)){};
 	matrix(int _r, int _c, string str):r(_r),c(_c)
 	{
-		// cout<<"matrix string"<<endl;
 		int rr = 0,cc = 0;
 		unsigned int start = 0, end = 0;
 
@@ -79,13 +55,9 @@ public:
 
 		for (; end < str.size(); end++)
 		{
-			// cout<<str[end]<<":";
 			if (str[end]!= ',') continue;
-			// cout<<"start="<<start<<", end ="<<end<<endl;
 			string chunk = str.substr(start,end-start);
-			// cout<<chunk<<endl;
 			double cur = stod(chunk);
-			// cout<<"r="<<r<<" ,c="<<c<<endl;
 			m[rr][cc] = cur;
 			start = end + 1;
 			if (cc + 1 < c)
@@ -104,12 +76,10 @@ public:
 		}
 		if (start != end)
 		{
-			// cout<<"start="<<start<<", end ="<<end<<endl;
 			string chunk = str.substr(start, end-start);
 			double cur = stod(chunk);
 			m[rr][cc] = cur;
 		}
-		// cout<<"string end"<<endl;
 	};
 	matrix(matrix& _m)
 	{
@@ -128,40 +98,26 @@ public:
 			}
 		}
 	};
-	matrix& makeT(int i, int j)
+	void transpose(int i, int j)
 	{
-		if( i >= r && j >= c) throw "out of range";
-		matrix &m = makeE();
-		m.set(i,j,1);
-		m.set(i,i,0);
-		m.set(j,j,0);
-		m.set(j,i,1);
-		return m;
-	};
-	matrix& makeR(int i, int j, double rr)
-	{
-		if ( i >= r && j >= c) throw "out of range";
-		matrix &m = makeE();
-		m.set(j,i,rr);
-		return m;
-	}
-	matrix& makeE()
-	{
-		double** res = getmem(r,c);
-		for (int i = 0; i < r; ++i)
+		double tmp;
+		for (int k = 0; k < c; ++k)
 		{
-			for (int j = 0; j < c; ++j)
-			{
-				res[i][j] = 0;
-				if ( i == j) res[i][j] = 1;
-			}
+			tmp = m[i][k];
+			m[i][k] = m[j][k];
+			m[j][k] = tmp;
 		}
-		return *(new matrix(r,c,res));
-	};
+	}
+	void addRow(int i, int j, double rr)
+	{
+		for (int ii = 0; ii < c; ++ii)
+		{
+			m[j][ii] += rr*m[i][ii];
+		}
+	}
 	matrix& operator=(matrix& _m)
 	{
-		// cout<<"oper="<<endl;
-		if(&_m == this) return *this;
+		if(_m.m == this->m) return *this;
 		if (r != _m.r && c != _m.c)
 		{
 			throw "different rang of matrix";
@@ -178,16 +134,14 @@ public:
 	};
 	matrix& operator+(matrix& _m)
 	{
-		double** res = getmem(r,c);
 		for (int i = 0; i < r; i++)
 		{
 			for (int j = 0; j < c; j++)
 			{
-				res[i][j] = m[i][j] + _m.m[i][j];
+				m[i][j] += _m.m[i][j];
 			}
 		}
-		cout<<"end +"<<endl;
-		return *(new matrix(r,c,res));
+		return *this;
 	};
 	matrix& operator*(matrix& _m)
 	{
@@ -203,10 +157,12 @@ public:
 				}
 				res[i][k] = cur;
 				cur = 0;
-			}
-
-		}
-		return *(new matrix(r,_m.c,res));
+			};
+		};
+		freemem(r,c);
+		c = _m.c;
+		m = res;
+		return *this;
 	}
 
 	double get(int i, int j)
